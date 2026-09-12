@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#090b09">
-  <meta name="description" content="Alex's Raspberry Pi command center and Chromium start page.">
-  <title>Alex // Pi Command Center</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23090b09'/%3E%3Cpath d='M18 18h28v28H18z' fill='none' stroke='%23b8d66d' stroke-width='4'/%3E%3Cpath d='M26 27h12M32 27v14' stroke='%23b8d66d' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#f3f0e9">
+  <meta name="description" content="Alex and Leah's shared home dashboard, with weather, everyday links, and notes.">
+  <title>At Home · Alex &amp; Leah</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%23365747'/%3E%3Cpath d='M15 30 32 16 49 30M21 27v22h22V27M28 49V36h8v13' fill='none' stroke='%23f3f0e9' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <style>
     :root {
       color-scheme: dark;
@@ -826,16 +826,84 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
     }
+    /* A shared home surface: warm paper, deep evergreen, and generous type. */
+    :root {
+      color-scheme: light;
+      --bg: #f3f0e9; --text: #263d34; --muted: #526258; --dim: #647067;
+      --line: #d9dfd5; --line-bright: #aabbaa; --accent: #365d49;
+      --accent-strong: #294c3a; --accent-soft: #e7ede2; --panel-hover: #edf1e8;
+      --good: #38734b; --danger: #ac3b35; --shadow: 0 8px 30px #233e2b06;
+      --radius: 24px;
+    }
+    body { background: var(--bg); }
+    body::before, .card::before { display: none; }
+    .shell { max-width: 1420px; padding-top: 32px; }
+    .topbar { margin-bottom: 26px; }
+    .brand-mark { width: 52px; height: 52px; background: #365d49; color: #fff; border: 0; border-radius: 50%; box-shadow: none; font-family: Georgia, serif; font-size: 1rem; }
+    .brand-name { font-family: Georgia, serif; font-size: 1.65rem; font-weight: 500; }
+    .brand-sub { font-family: inherit; text-transform: none; letter-spacing: .02em; font-size: .9rem; }
+    .status-chip, .icon-button { background: #fafbf7; min-height: 44px; }
+    .search-input, .search-input:focus { background: #fffefa; height: 62px; }
+    .search-wrap { margin-bottom: 24px; }
+    kbd { background: #f3f5ef; }
+    .dashboard { gap: 20px; }
+    .card { background: #fffefa; }
+    .clock-card { background: #365747; color: #fffdf4; grid-column: span 7; min-height: 260px; }
+    .clock-card .eyebrow, .clock-card .time-period { color: #e1e9d1; }
+    .clock-card .date-sub { color: #d3dfd2; }
+    .eyebrow { font-family: inherit; text-transform: none; letter-spacing: .02em; font-size: 1rem; }
+    .clock-row { flex-wrap: wrap; gap: 24px; }
+    .time { font-family: Georgia, serif; font-weight: 400; letter-spacing: -.035em; font-size: clamp(3.5rem, 6vw, 6rem); }
+    .date-block { text-align: left; }
+    .date-main { font-size: 1.15rem; }
+    .card-title { font-family: Georgia, serif; font-size: 1.4rem; text-transform: none; letter-spacing: -.015em; font-weight: 500; }
+    .card-meta { font-size: .875rem; white-space: normal; }
+    .temperature { font-family: Georgia, serif; font-weight: 400; }
+    .stat-label, .forecast-name { font-size: .8rem; }
+    .stat-value, .forecast-temp { font-family: inherit; font-size: 1rem; }
+    .launch-card { grid-column: 1 / -1; min-height: 0; }
+    .link-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .launch-link { min-height: 100px; background: #f5f6f0; border-color: transparent; padding: 17px; }
+    .launch-name { font-size: 1rem; }
+    .launch-icon { background: #e4ecdf; width: 33px; height: 33px; }
+    .notes-card { grid-column: 1 / span 8; grid-row: 3; background: #eee8dc; }
+    .notes-input { min-height: 170px; }
+    .notes-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+    .system-card { grid-column: 9 / -1; grid-row: 3; background: transparent; box-shadow: none; }
+    .system-value { font-family: inherit; font-size: .875rem; }
+    .mini-dot { display: none; }
+    #systemNetDot { display: inline-block; }
+    .footer { font-family: inherit; font-size: .8rem; }
+    dialog { background: #fffefa; }
+    .field input { background: #f5f6f0; }
+    .button.primary { color: #fff; }
+    .toast { background: #365747; color: #fff; }
+    .skeleton { background: #e7ecdf; }
+    @media (max-width: 900px) {
+      .clock-card, .weather-card { grid-column: 1 / -1; }
+      .notes-card { grid-column: 1 / span 7; }
+      .system-card { grid-column: 8 / -1; }
+    }
+    @media (max-width: 760px) {
+      .shell { padding-top: 20px; }
+      .link-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .notes-card, .system-card { grid-column: 1 / -1; grid-row: auto; }
+      .system-card { order: 5; }
+      .clock-card { min-height: 240px; }
+      .brand-sub { display: block; }
+      .brand-name { font-size: 1.5rem; }
+      .time { font-size: clamp(3.4rem, 15vw, 5rem); }
+    }
   </style>
 </head>
 <body>
   <main class="shell">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">PI</div>
+        <div class="brand-mark" aria-hidden="true">A&amp;L</div>
         <div>
-          <p class="brand-name">Alex // Command Center</p>
-          <p class="brand-sub">Raspberry Pi home node</p>
+          <h1 class="brand-name">At Home</h1>
+          <p class="brand-sub">Alex &amp; Leah</p>
         </div>
       </div>
 
@@ -863,9 +931,9 @@
       </button>
     </form>
 
-    <section class="dashboard" aria-label="Command center dashboard">
+    <section class="dashboard" aria-label="Shared home dashboard">
       <article class="card clock-card">
-        <p class="eyebrow"><span id="greeting">Good afternoon</span> // <span id="locationTop">Palm Coast</span></p>
+        <p class="eyebrow"><span id="greeting">Welcome home</span> · <span id="locationTop">Palm Coast</span></p>
         <div class="clock-row">
           <p class="time"><span id="clock">--:--</span><span class="time-period" id="period">--</span></p>
           <div class="date-block">
@@ -902,7 +970,7 @@
 
       <article class="card launch-card">
         <div class="card-head">
-          <h2 class="card-title">Quick Launch</h2>
+          <h2 class="card-title">Everyday favorites</h2>
           <span class="card-meta">Tap to open</span>
         </div>
         <nav class="link-grid" id="linkGrid" aria-label="Quick links"></nav>
@@ -910,7 +978,7 @@
 
       <article class="card system-card">
         <div class="card-head">
-          <h2 class="card-title">Node Status</h2>
+          <h2 class="card-title">At a glance</h2>
           <span class="card-meta">This browser</span>
         </div>
         <div class="system-list">
@@ -939,16 +1007,16 @@
 
       <article class="card notes-card">
         <div class="card-head">
-          <h2 class="card-title">Quick Notes</h2>
-          <div><span class="card-meta" id="saveState">Saved on this Pi</span><button class="text-button" id="clearNotes" type="button">Clear</button></div>
+          <h2 class="card-title">Our notepad</h2>
+          <div><span class="card-meta" id="saveState">Saved on this device</span><button class="text-button" id="clearNotes" type="button">Clear</button></div>
         </div>
         <label for="notes" hidden>Quick notes saved on this device</label>
-        <textarea class="notes-input" id="notes" placeholder="Leave yourself a reminder, an address, a print job note…"></textarea>
+        <textarea class="notes-input" id="notes" placeholder="A grocery reminder, a plan for the weekend, or a little note for each other…"></textarea>
       </article>
     </section>
 
     <footer class="footer">
-      <span>ALEX // PI CONTROL v1.0</span>
+      <span>At Home · Alex &amp; Leah</span>
       <span>Settings and notes stay on this device // Weather: <a href="https://open-meteo.com/">Open-Meteo</a></span>
     </footer>
   </main>
@@ -1077,7 +1145,7 @@
         greeting.textContent = greetingText;
         systemTime.textContent = `${hours}:${minutes}:${seconds} ${meridiem}`;
         dateMain.textContent = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' }).format(now);
-        dateSub.textContent = `${now.getFullYear()} // Day ${String(dayOfYear(now)).padStart(3, '0')}`;
+        dateSub.textContent = 'A little space for your day, together.';
       }
 
       function updateNetwork() {
@@ -1296,7 +1364,7 @@
         $('#saveState').textContent = 'Saving…';
         notesTimer = setTimeout(() => {
           localStorage.setItem(STORAGE.notes, notes.value);
-          $('#saveState').textContent = 'Saved on this Pi';
+          $('#saveState').textContent = 'Saved on this device';
         }, 350);
       });
 
@@ -1304,7 +1372,7 @@
         if (!notes.value || window.confirm('Clear your saved quick notes?')) {
           notes.value = '';
           localStorage.removeItem(STORAGE.notes);
-          $('#saveState').textContent = 'Saved on this Pi';
+          $('#saveState').textContent = 'Saved on this device';
         }
       });
 
